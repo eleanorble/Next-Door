@@ -1,0 +1,32 @@
+---
+title: "Next-door"
+author: "Eleanor"
+date: "11/15/2018"
+output: html_document
+---
+
+```{r}
+library(jsonlite)
+library(urltools)
+
+
+apikey <- "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNCbURJNmtaYWFiSzlFa2hKQlZSdHZ2d0M3a1ljMDJJRUFXcGxDRVZuSnN6UXFUelBvQ0JSdmZBcVBRSG5VYy1yWnc5ekptYjZxdVpuSWVXZWxTVVV1TksyUUVmMzNyZUc3SnhCcEU0ekdvTW1vS05BT2ZxOTB3ak9YTVhiVkRrWG1tcklJSGk1M3I1TDVPa1c4RTdjTGdBakFOQlVUR0JBLUhtOG9GUzhSWWRaTGpYSzV5UURXZ3V5eVZhcTJCZWUzdndfVjI4TVAxYURJVGw4YXNYWnd3N2JoS240SG1zbVZFaWg0OWQzdzhoc3ZNeXVfS080OWJpMmRPNkZHYWhZUFFUaEU2dGVLeU1PZUhPRjZpY0t4cEdoX2FxVS04VVl6ZC1IM2tQRzZNaUk1VXNUMkwxam5iNm9rYlFsNTh3XzJXLS1PV2txUG9KOHNEMlppVGNPdz09IiwidHlwIjoiSldUIn0.eyJhdF9oYXNoIjoidzRiL2F6Y0J4d1FvVzUydE5EMzduQSIsImF1ZCI6WyJSSU5HQkVBUkVSLUxJVEUtVE9LRU4tSU9TIiwibmV4dGRvb3IiXSwiZXhwIjoxNTQyMzg1NzcxLCJpYXQiOjE1NDIyOTkzNzEsImlzcyI6Imh0dHBzOi8vYXV0aC5uZXh0ZG9vci5jb20iLCJuZF9wcmMiOlt7ImNvdW50cnkiOiJVUyIsInBpZCI6IjMzMjgyNzU2IiwidXJsIjoiaHR0cHM6Ly91c2VyLm5leHRkb29yLmNvbS92MS9wcm9maWxlLzMzMjgyNzU2In0seyJjb3VudHJ5IjoiVVMiLCJwaWQiOiJjY2ExZjliMy0wMTUyLTQxNWUtYTNhMi05OWJmNGIzOTc2ZGQiLCJ1cmwiOiJodHRwczovL2F1dGgubmV4dGRvb3IuY29tL3YxL3Byb2ZpbGVzL1VTIn1dLCJzdWIiOiJkNDFiNzk0Mi0wYTJiLTRkYzAtYWIxYy1mNDQ3ZjJhNjg0NGQifQ.PXUUqW-UL00LhbA8NUsDB5DCy0fjEISP-0-Vv9Yxj38ZEXVq2Xnz3qdWff1seLmwmTzm0LajFe0R8IRjN6F1xSW-YNp8rll7oCh9Fr_0Ck1-YWyWZj3rPStb4tfK5VJxVsHp6dSQ9dZgK7gyEaggCzvMYH1wpmDil7M59mpyy8oLoqg9QgNdeFy2ndlGgb3QYc0vjAywD0TQ4RXJbiF9FAHeNTNhbe-wvWmkaLNCq5tNWZokKwBOg8qXIG7kgx_bhzmB9JVTxZmlohvjydx1oMhfcJhKqFiSHa9tn0AWWrE9t1rIJr6nGX9QtEwQ1cnMVmxG_ZqIT-wOQu2LROVnjg"
+
+  
+url <- "https://stevesie.com/workers/56d21e3d-22b7-4a48-b6a7-48eaacf4a637.json"
+url <- param_set(url, "q", url_encode("cat"))
+url <- param_set(url, "api-key", url_encode(apikey))
+
+
+url<-
+
+url<-"https://stevesie.com/api/v1/export?workerId=56d21e3d-22b7-4a48-b6a7-48eaacf4a637&taskCollectionId=52c3de1e-df17-491a-863e-dd588dc1de4a&format=json&limit=1000&offset=0&sortBy=knownAt&sortOrder=desc&token=b13d5e83-7342-4bed-a0db-b6c4eab41efe"
+nextdoor_data <- fromJSON(url)$items 
+nextdoor_data$post_date<-lubridate::as_datetime(as.numeric(nextdoor_data$object$creation_date))
+
+```
+
+cleaning up columns 
+how to get more than 20 
+all posts from the last week? 
+figure out how to get everything that's there 
