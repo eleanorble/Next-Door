@@ -123,7 +123,10 @@ ND_common_sub<-ND_common_sub%>%
   filter(count>1)
 
 ggplot(ND_common_sub, aes(word,count))+
-  geom_col()
+  geom_col(fill="maroon")+
+  xlab("Neighborhood") + 
+  ggtitle("Most common words in subjects of posts for both Mound and Mac-Grove") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 #This visualization shows the most common words in the subject lines of posts in both the Mound and Mac Grove neighborhoods. 
 #Because we haven't figured out how to call the api multiple times to get a bunch of post data, and we haven't gotten the other neighborhood (prospect park) 
