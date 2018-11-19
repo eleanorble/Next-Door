@@ -24,9 +24,72 @@ url<-"https://stevesie.com/api/v1/export?workerId=56d21e3d-22b7-4a48-b6a7-48eaac
 nextdoor_data <- fromJSON(url)$items 
 nextdoor_data$post_date<-lubridate::as_datetime(as.numeric(nextdoor_data$object$creation_date))
 
+
+
+
+"Location of posts for Mac-Groveland:" 
+
+library(dplyr)
+colnames(macgroveland_data)
+dim(macgroveland_data)
+macgroveland_data$object
+sapply(macgroveland_data, class)
+macgroveland_data_flat <- jsonlite::flatten(macgroveland_data)
+names(macgroveland_data_flat)
+sapply(macgroveland_data_flat, class)
+
+
+macgroveland_data2 <- 
+  macgroveland_data_flat %>%
+  select(post_date, object.by_line_text_bottom_in_detail)
+ 
+complete <- macgroveland_data2[complete.cases(macgroveland_data2), ]
+names(complete)
+
+library(ggplot2)
+
+ggplot(complete, aes(x=object.by_line_text_bottom_in_detail)) + 
+  geom_bar(fill="orange") + 
+  xlab("Neighborhood") + 
+  ggtitle("Neighborhood representation in first 20 posts for Mac-Groveland") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+
+"Location of posts for Mound"
+
+library(dplyr)
+colnames(mound_data)
+dim(mound_data)
+mound_data$object
+sapply(mound_data, class)
+mound_data_flat <- jsonlite::flatten(mound_data)
+names(mound_data_flat)
+sapply(mound_data_flat, class)
+
+
+mound_data2 <- 
+  mound_data_flat %>%
+  select(post_date, object.by_line_text_bottom_in_detail)
+ 
+complete2 <- mound_data2[complete.cases(mound_data2), ]
+names(complete)
+
+library(ggplot2)
+
+ggplot(complete2, aes(x=object.by_line_text_bottom_in_detail)) + 
+  geom_bar(fill="maroon") + 
+  xlab("Neighborhood") + 
+  ggtitle("Neighborhood representation in first 20 posts for Mound") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+"When you log in to nextdoor, you see posts from your neighborhood and from nearby neighborhoods. The API scrapes the most recent data on posts from your homepage; therefore, each neighborhood (Mac-Groveland and Mound) contain data from posts from their neighborhoods and nearby ones." 
+
+"These visualizations show how many times users from the various represented neighborhoods posted in the most recent 20 posts from the Mac-Groveland and Mound homepages. While we can't draw conclusions from such as small data frame, it seems that Mac-Groveland is pretty active while Mound is less active compared to their respective surrounding neighborhoods."   
+  
 ```
 
-cleaning up columns 
-how to get more than 20 
-all posts from the last week? 
-figure out how to get everything that's there 
+```
+
+
+```
