@@ -1,0 +1,49 @@
+---
+title: "Next-door"
+author: "Mia Smith"
+date: "11/15/2018"
+output: html_document
+---
+
+```{r}
+library(jsonlite)
+library(urltools)
+library(lubridate)
+library(dplyr)
+
+url<-"https://stevesie.com/api/v1/export?workerId=56d21e3d-22b7-4a48-b6a7-48eaacf4a637&taskCollectionId=52c3de1e-df17-491a-863e-dd588dc1de4a&format=json&limit=1000&offset=0&sortBy=knownAt&sortOrder=desc&token=b13d5e83-7342-4bed-a0db-b6c4eab41efe"
+macgroveland_data <- fromJSON(url)$items 
+macgroveland_data$post_date<-lubridate::as_datetime(as.numeric(macgroveland_data$object$creation_date))
+
+```
+
+```{r}
+url2<-"https://stevesie.com/api/v1/export?workerId=47dd772c-730a-46db-a34d-4b2e731195c7&taskCollectionId=52c3de1e-df17-491a-863e-dd588dc1de4a&format=json&limit=1000&offset=0&sortBy=knownAt&sortOrder=desc&token=f1b22ab6-7aea-416e-83f3-5b64d73bc203"
+mound_data <- fromJSON(url2)$items 
+mound_data$post_date<-lubridate::as_datetime(as.numeric(mound_data$object$creation_date))
+```
+
+```{r}
+macdata <- macgroveland_data$object 
+classified_mac <- macdata$classified
+
+classified_mac <- classified_mac %>%
+  dplyr::mutate(neighborhood = "Mac Groveland")
+
+mounddata <- mound_data$object
+classified_mound <- mounddata$classified
+
+classified_mound <- classified_mound %>%
+  dplyr::mutate(neighborhood = "Mound")
+
+data <- classified_mac %>%
+  bind_rows(classified_mound) %>%
+  drop_na(price) %>%
+  mutate(price2=as.numeric(price))
+
+ggplot(data, aes(y=price2, fill=neighborhood))+
+  geom_boxplot()+
+  scale_y_log10()+
+  ggtitle("Price of Items for Sale on Nextdoor in Mound and Mac Groveland")
+```
+
