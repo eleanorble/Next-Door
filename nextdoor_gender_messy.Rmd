@@ -1,0 +1,142 @@
+---
+title: "Next-door"
+author: "Marlee Yost-Wolff"
+date: "11/15/2018"
+output: html_document
+---
+
+```{r}
+library(jsonlite)
+library(urltools)
+
+
+macgrovelandapikey <- "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNCbURJNmtaYWFiSzlFa2hKQlZSdHZ2d0M3a1ljMDJJRUFXcGxDRVZuSnN6UXFUelBvQ0JSdmZBcVBRSG5VYy1yWnc5ekptYjZxdVpuSWVXZWxTVVV1TksyUUVmMzNyZUc3SnhCcEU0ekdvTW1vS05BT2ZxOTB3ak9YTVhiVkRrWG1tcklJSGk1M3I1TDVPa1c4RTdjTGdBakFOQlVUR0JBLUhtOG9GUzhSWWRaTGpYSzV5UURXZ3V5eVZhcTJCZWUzdndfVjI4TVAxYURJVGw4YXNYWnd3N2JoS240SG1zbVZFaWg0OWQzdzhoc3ZNeXVfS080OWJpMmRPNkZHYWhZUFFUaEU2dGVLeU1PZUhPRjZpY0t4cEdoX2FxVS04VVl6ZC1IM2tQRzZNaUk1VXNUMkwxam5iNm9rYlFsNTh3XzJXLS1PV2txUG9KOHNEMlppVGNPdz09IiwidHlwIjoiSldUIn0.eyJhdF9oYXNoIjoidzRiL2F6Y0J4d1FvVzUydE5EMzduQSIsImF1ZCI6WyJSSU5HQkVBUkVSLUxJVEUtVE9LRU4tSU9TIiwibmV4dGRvb3IiXSwiZXhwIjoxNTQyMzg1NzcxLCJpYXQiOjE1NDIyOTkzNzEsImlzcyI6Imh0dHBzOi8vYXV0aC5uZXh0ZG9vci5jb20iLCJuZF9wcmMiOlt7ImNvdW50cnkiOiJVUyIsInBpZCI6IjMzMjgyNzU2IiwidXJsIjoiaHR0cHM6Ly91c2VyLm5leHRkb29yLmNvbS92MS9wcm9maWxlLzMzMjgyNzU2In0seyJjb3VudHJ5IjoiVVMiLCJwaWQiOiJjY2ExZjliMy0wMTUyLTQxNWUtYTNhMi05OWJmNGIzOTc2ZGQiLCJ1cmwiOiJodHRwczovL2F1dGgubmV4dGRvb3IuY29tL3YxL3Byb2ZpbGVzL1VTIn1dLCJzdWIiOiJkNDFiNzk0Mi0wYTJiLTRkYzAtYWIxYy1mNDQ3ZjJhNjg0NGQifQ.PXUUqW-UL00LhbA8NUsDB5DCy0fjEISP-0-Vv9Yxj38ZEXVq2Xnz3qdWff1seLmwmTzm0LajFe0R8IRjN6F1xSW-YNp8rll7oCh9Fr_0Ck1-YWyWZj3rPStb4tfK5VJxVsHp6dSQ9dZgK7gyEaggCzvMYH1wpmDil7M59mpyy8oLoqg9QgNdeFy2ndlGgb3QYc0vjAywD0TQ4RXJbiF9FAHeNTNhbe-wvWmkaLNCq5tNWZokKwBOg8qXIG7kgx_bhzmB9JVTxZmlohvjydx1oMhfcJhKqFiSHa9tn0AWWrE9t1rIJr6nGX9QtEwQ1cnMVmxG_ZqIT-wOQu2LROVnjg"
+
+
+
+url<-"https://stevesie.com/api/v1/export?workerId=56d21e3d-22b7-4a48-b6a7-48eaacf4a637&taskCollectionId=52c3de1e-df17-491a-863e-dd588dc1de4a&format=json&limit=1000&offset=0&sortBy=knownAt&sortOrder=desc&token=b13d5e83-7342-4bed-a0db-b6c4eab41efe"
+macgroveland_data <- fromJSON(url)$items 
+macgroveland_data$post_date<-lubridate::as_datetime(as.numeric(macgroveland_data$object$creation_date))
+
+```
+
+
+
+```{r}
+library(jsonlite)
+library(urltools)
+
+
+moundapikey <- "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNCbURJNmtaYWFiSzlFa2hKQlZSdHZ2d0M3a1ljMDJJRUFXcGxDRVZuSnN6UXFUelBvQ0JSdmZBcVBRSG5VYy1yWnc5ekptYjZxdVpuSWVXZWxTVVV1TksyUUVmMzNyZUc3SnhCcEU0ekdvTW1vS05BT2ZxOTB3ak9YTVhiVkRrWG1tcklJSGk1M3I1TDVPa1c4RTdjTGdBakFOQlVUR0JBLUhtOG9GUzhSWWRaTGpYSzV5UURXZ3V5eVZhcTJCZWUzdndfVjI4TVAxYURJVGw4YXNYWnd3N2JoS240SG1zbVZFaWg0OWQzdzhoc3ZNeXVfS080OWJpMmRPNkZHYWhZUFFUaEU2dGVLeU1PZUhPRjZpY0t4cEdoX2FxVS04VVl6ZC1IM2tQRzZNaUk1VXNUMkwxam5iNm9rYlFsNTh3XzJXLS1PV2txUG9KOHNEMlppVGNPdz09IiwidHlwIjoiSldUIn0.eyJhdF9oYXNoIjoieDJaNDRkSHdhYjV5Tk1kNThCWTU1dyIsImF1ZCI6WyJSSU5HQkVBUkVSLUxJVEUtVE9LRU4tSU9TIiwibmV4dGRvb3IiXSwiZXhwIjoxNTQyNjU5MDAyLCJpYXQiOjE1NDI1NzI2MDIsImlzcyI6Imh0dHBzOi8vYXV0aC5uZXh0ZG9vci5jb20iLCJuZF9wcmMiOlt7ImNvdW50cnkiOiJVUyIsInBpZCI6IjMzNjQwNjA5IiwidXJsIjoiaHR0cHM6Ly91c2VyLm5leHRkb29yLmNvbS92MS9wcm9maWxlLzMzNjQwNjA5In0seyJjb3VudHJ5IjoiVVMiLCJwaWQiOiI3ZWZhODYzNy0xMWRkLTQwNmUtYTZiNi04MDIzZDM0MDViMzIiLCJ1cmwiOiJodHRwczovL2F1dGgubmV4dGRvb3IuY29tL3YxL3Byb2ZpbGVzL1VTIn1dLCJzdWIiOiJiZjc4NjcxNi1lZmM3LTQ1OTUtYTQ4YS0zM2VjOGRkNzQwNWMifQ.sA2e0EfQeMuBCALn1Y-NX3MxtxiwsutNP6XLQ66G8oRQnxPsEvNOGeQfiJOr9qH3lXNOzYFdlon3m6nL7I32xmKtO-3xEvghXN0nlrXgQ9rtl2d61ESnDw7zVW0ZKh7mo1XwWA-M8qmUu-z9K0VjyX-t5SKGSmAD2GHzYtausqnMZunGsZGHuzmSRL9RvqFWNgOedQF3-B1tuAcaddMDutRtHb8Nxoie970KKdGIWo7HFU06LheFqV6sOWDjerqGCfPrtdbNceR0978Z70LrZh4XQaEDjA9gp1SgUAKjDJrcqkD02W4fxWNJcR_Mf2zxHHEPpuDtr8ZPHnOnS1RdyQ"
+
+
+
+url2<-"https://stevesie.com/api/v1/export?workerId=47dd772c-730a-46db-a34d-4b2e731195c7&taskCollectionId=52c3de1e-df17-491a-863e-dd588dc1de4a&format=json&limit=1000&offset=0&sortBy=knownAt&sortOrder=desc&token=f1b22ab6-7aea-416e-83f3-5b64d73bc203"
+mound_data <- fromJSON(url2)$items 
+mound_data$post_date<-lubridate::as_datetime(as.numeric(mound_data$object$creation_date))
+```
+
+```{r, eval = FALSE}
+# View(macgroveland_data)
+# View(mound_data)
+
+MacGroveNames <-macgroveland_data %>%
+  separate(macgroveland_data$object.by_line.name, into = c("first", "last"), remove = TRUE)
+
+GenderPractice <- FirstLast %>%
+  select(-c(LastName)) %>%
+  arrange(First)
+
+# ====================================================================
+
+MoundNames <- mound_data %>%
+  separate(object.by_line.name, into = c("Last", "First"), sep = " ", remove = TRUE)
+
+GenderPractice <- FirstLast %>%
+  select(-c(LastName)) %>%
+  arrange(First)
+```
+
+```{r}
+macg_mound <- read.csv("/Users/HenryComputer/Documents/MACALESTER/Fall 2018/Data Science/FinalProj/MoundMacG.csv")
+
+tester_mgm <- read.csv("/Users/HenryComputer/Documents/MACALESTER/Fall 2018/Data Science/FinalProj/MoundMacG2.csv")
+
+# txtmgm <- read.table("/Users/HenryComputer/Documents/MACALESTER/Fall 2018/Data Science/FinalProj/MoundMacG_readtable.txt")
+```
+
+
+```{r}
+library(gender)
+library(genderdata)
+
+
+class(tester_mgm$NeighArea)
+
+# typeof(macg_mound$Last)
+# typeof(macg_mound$NeighArea)
+# typeof(macg_mound$NeighSpec)
+# 
+# toString(macg_mound$First)
+# 
+# typeof(macg_mound$First)
+# 
+# macg_mound$First <- c(macg_mound$First)
+
+
+mgm_test <- macg_mound %>%
+  mutate(newfirst = toString(First)) %>%
+  mutate(newlast = toString(Last)) %>%
+  mutate(newNeighArea = toString(NeighArea)) %>%
+  mutate(newNeighSpec = toString(NeighSpec))
+
+typeof(mgm_test$newfirst)
+typeof(mgm_test$newlast)
+typeof(mgm_test$newNeighArea)
+typeof(mgm_test$newNeighSpec)
+
+# as.character(macg_mound$First)
+# is.character(macg_mound$First)
+# type.convert(macg_mound$First, na.strings = "NA", as.is = FALSE)
+
+
+
+mgm_gen <- gender(as.character(mgm_tester$FirstN), method = "ssa", countries = "United States")
+
+MG_M_Practice <- mgm_test %>%
+  gender(newfirst, method = "ssa", countries = "United States")
+
+first_nam <- unique(tester_mgm$First)
+
+typeof(first_nam)
+
+fnmgm <- as.vector(first_nam)
+typeof(fnmgm)
+
+CodedGender_MGM <- gender(fnmgm, method = "ssa", countries = "United States")
+
+Join_MGM <- full_join(macg_mound, CodedGender_MGM, by = c("First" = "name"))
+
+typeof(Join_MGM$gender)
+
+```
+
+```{r}
+ggplot(Join_MGM, aes(x=gender)) +
+  geom_bar(alpha = .7, fill = "darkgreen") + 
+  ggtitle("Predicted Gender of Nextdoor Members, from Mac Groveland and Mound Neighborhoods") +
+  xlab("Predicted Gender of Nextdoor Poster") +
+  ylab("Count") +
+  theme_minimal()
+```
+
+
+
+```{r}
+namesmgm <- matrix(c("Wendy", "Van Neste", "Mound", "Tonka Bay", "Laura", "Ammon", "Mound", "Tonka Bay"),ncol=4,byrow=TRUE)
+colnames(namesmgm) <- c("FirstN","LastN","NeighArea", "NeighSpecific")
+namesmgm <- as.table(namesmgm)
+namesmgm
+
+```
+
