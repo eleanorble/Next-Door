@@ -88,8 +88,45 @@ ggplot(complete2, aes(x=object.by_line_text_bottom_in_detail)) +
 "These visualizations show how many times users from the various represented neighborhoods posted in the most recent 20 posts from the Mac-Groveland and Mound homepages. While we can't draw conclusions from such as small data frame, it seems that Mac-Groveland is pretty active while Mound is less active compared to their respective surrounding neighborhoods."   
   
 ```
+```{r}
+MG_objects<-macgroveland_data$object
+mound_objects<-mound_data$object
 
-```
+library(tidytext)
+library(ggplot2)
 
+ND_data <- nextdoor_data$object
+
+MG_subject<-MG_objects%>%
+  unnest_tokens(word, subject)%>%
+  select(word)
+
+MG_subject$neighborhood<-"Mac-Grove"
+
+Mound_subject<-mound_objects%>%
+  unnest_tokens(word, subject)%>%
+  select(word)
+
+Mound_subject$neighborhood<-"Mound"
+
+ND_common_sub<-rbind(Mound_subject,MG_subject)
+
+ND_common_sub<-ND_common_sub %>%
+  filter(!is.na(word))%>%
+  group_by(word)%>%
+  summarise(count = n())%>%
+  arrange(desc(count))
+
+ND_common_sub$count<-as.numeric(ND_common_sub$count)
+
+ND_common_sub<-ND_common_sub%>%
+  filter(count>1)
+
+ggplot(ND_common_sub, aes(word,count))+
+  geom_col()
+
+#This visualization shows the most common words in the subject lines of posts in both the Mound and Mac Grove neighborhoods. 
+#Because we haven't figured out how to call the api multiple times to get a bunch of post data, and we haven't gotten the other neighborhood (prospect park) 
+#and a lot of posts didn't have subjects available this was based on just about 10 subjects. We're still learning about tidy text so we can use this package to do a sentiment analysis in the future. 
 
 ```
