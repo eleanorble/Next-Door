@@ -156,3 +156,30 @@ ggplot(Mac_Mound2, aes(x=day_label,y=n, fill=Neighborhood))+ geom_col(position= 
 
 # This visualization shows that users in the Mac Groveland Area posted on Nextdoor most during the middle of the week, while users in Mound posted most during the weekend. There are two days of the week where only users in Mac Groveland posted, and one day of the week where only users in Mound posted. This could suggest different ways that users in Mac Groveland and Mound use Nextdoor, in terms of frequency, total postings, and weekday versus weekend usage. 
 ```
+
+
+
+library(gender)
+library(genderdata)
+
+tester_mgm <- read.csv("/Users/HenryComputer/Documents/MACALESTER/Fall 2018/Data Science/FinalProj/MoundMacG2.csv")
+
+first_nam <- unique(tester_mgm$First)
+
+fnmgm <- as.vector(first_nam)
+typeof(fnmgm)
+
+CodedGender_MGM <- gender(fnmgm, method = "ssa", countries = "United States")
+
+Join_MGM <- full_join(macg_mound, CodedGender_MGM, by = c("First" = "name"))
+
+
+# PRELIMINARY GENDER BARPLOT
+ggplot(Join_MGM, aes(x=gender)) +
+  geom_bar(alpha = .7, fill = "darkgreen") + 
+  ggtitle("Predicted Gender of Nextdoor Members, from Mac Groveland and Mound Neighborhoods") +
+  xlab("Predicted Gender of Nextdoor Poster") +
+  ylab("Count") +
+  theme_minimal()
+
+# This visualization depicts the predicted gender breakdown of the combined Macalester-Groveland and Mound neighborhoods. There were some issues wrangling data so this visualzation combines the two neighborhoods rather than comparing them. Once we have access to more data, a revised visualization of predicted gender (comparing neighborhoods by both raw numbers and as proportions) will be made. Despite some issues with data, this preliminary barplot does provide some insight into what the gender demographics of NextDoor might look like. This visualization shows that the number of predicted females is more than three times the number of predicted males. It will be interesting to see if results from this small sample size are comparable to the broader NextDoor population. 
