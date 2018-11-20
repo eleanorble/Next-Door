@@ -133,3 +133,26 @@ ggplot(ND_common_sub, aes(word,count))+
 #and a lot of posts didn't have subjects available this was based on just about 10 subjects. We're still learning about tidy text so we can use this package to do a sentiment analysis in the future. 
 
 ```
+```{r}
+MacData<- nextdoor_data %>%
+  mutate(dotw= wday(nextdoor_data$post_date))
+MacData['Neighborhood'] = 'Mac'
+
+MoundData<- mound_data %>%
+  mutate(dotw= wday(mound_data$post_date))
+MoundData['Neighborhood'] = 'Mound'
+
+Mac_Mound <- smartbind(MacData, MoundData) %>%
+  na.omit(Mac_Mound)
+  
+Label1<-Mac_Mound %>%
+  mutate(day_label= lubridate::wday(Mac_Mound$post_date, label = TRUE, abbr=FALSE))
+ 
+Mac_Mound2 <- Label1%>%
+  dplyr::group_by(Neighborhood,day_label)%>%
+  dplyr::summarise(n=n())
+
+ggplot(Mac_Mound2, aes(x=day_label,y=n, fill=Neighborhood))+ geom_col(position= "dodge", alpha= 0.5)
+
+# This visualization shows that users in the Mac Groveland Area posted on Nextdoor most during the middle of the week, while users in Mound posted most during the weekend. There are two days of the week where only users in Mac Groveland posted, and one day of the week where only users in Mound posted. This could suggest different ways that users in Mac Groveland and Mound use Nextdoor, in terms of frequency, total postings, and weekday versus weekend usage. 
+```
