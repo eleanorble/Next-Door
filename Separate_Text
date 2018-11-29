@@ -1,0 +1,22 @@
+nrc_neg <- get_sentiments("nrc") %>%
+  filter(sentiment == "negative")
+
+comp_sent <- comp_plan %>%
+  select(text)
+
+tokened <- unnest_tokens(comp_sent, word, text)
+
+negtok_join <- tokened %>%
+  inner_join(nrc_neg, by=c("word" = "word")) %>%
+  group_by(word) %>%
+  summarise(n = n())
+
+# ========================================================
+
+nrc_pos <- get_sentiments("nrc") %>%
+  filter(sentiment == "positive")
+
+postok_join <- tokened %>%
+  inner_join(nrc_pos, by=c("word" = "word")) %>%
+  group_by(word) %>%
+  summarise(n = n())
