@@ -21,6 +21,34 @@ comp_plan <- search_tweets(
   "mpls2040", n = 18000, include_rts = FALSE
 )
 
+#st paul comp search - getting all tweets about st paul 
+stp_terms <-c("stp", "st paul", "St. Paul", "st. paul", "saint paul", 
+              "Saint Paul", "St. paul", "St Paul", "St paul", "STP")
+
+terms_search <- paste(stp_terms, collapse = " OR ")
+
+stp_tweets <- search_tweets(terms_search, n=8000, lang="en")
+
+#cleaning tweets
+stp_tweets<-stp_tweets%>%
+  mutate(clean_tweet=gsub('[[:punct:] ]+',' ', text))
+
+stp_tweets$clean_tweet<-tolower(stp_tweets$clean_tweet)
+
+stp_tweets$text<-NULL
+colnames(stp_tweets)[colnames(stp_tweets)=="clean_tweet"]<-"text"
+
+#looking for comp tweets
+comp_terms <- c("comp", "plan", "comp plan", "comprehensive", "2040")
+comp_terms_grepl <- c("comp|plan|comp plan|comprehensive|2040")
+
+
+stp_tweets<-stp_tweets%>%
+  mutate(comp_tweet = ifelse(grepl(comp_terms_grepl, text),"yes","no"))%>%
+  filter(comp_tweet=="yes")
+
+stp_tweets$comp_tweet<-NULL
+
 # score.sentiment <-function(sentences, pos.words, neg.words, .progress='none')
 #   {
 #   require(dplyr)
