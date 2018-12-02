@@ -1,0 +1,207 @@
+if (!require(pacman)) install.packages('pacman')
+library(pacman)
+library(twitteR)
+library(usmap)
+library(stringr)
+
+p_load(tidyverse,  # Suite of tools for data analysis using "tidy" framework
+       rtweet,     # Access twitter data
+       tidytext,   # Tools for text analysis
+       maps        # Map data
+)
+
+
+create_token(consumer_key = "nbs2ifQThpe2c0GbAGxNzStlC",
+             consumer_secret = "ZIaiorCe6ztntVBYHSHD1KmyVpl34rTWiOJuFOGTkbsUbQz16q",
+             access_token  = "547223936-XVkpzznbCkAmE6G0qO29KEbDtgs51pBhcuaGtbvE",
+             access_secret = "AaS4yhVz7S1Bd5qh2DGqo4CkVO1kTQIFSOIgBK01At0uN")
+
+
+comp_plan <- search_tweets(
+  "mpls2040", n = 18000, include_rts = FALSE
+)
+#looking for comp tweets
+comp_terms <- c("comp", "plan", "comp plan", "comprehensive", "2040")
+comp_terms_grepl <- c("comp|plan|comp plan|comprehensive|2040")
+terms_search <- paste(comp_terms, collapse = " OR ")
+
+#st paul comp search - getting all tweets about st paul 
+stp_terms <-c("stp", "st paul", "St. Paul", "st. paul", "saint paul", 
+              "Saint Paul", "St. paul", "St Paul", "St paul", "STP")
+stp_terms_search<- paste(stp_terms, collapse = " OR ")
+
+#test: retrieving a specific tweet by a guy whose last name is Peterson
+peterson_terms <- c("Awesome", "St Paul 2040 Comp Plan", "Core Values")
+peterson_search <- paste(peterson_terms, collapse = " AND ")
+
+comp_tweets <- search_tweets(terms_search, n=8000, lang="en")
+
+peterson_tweets <- search_tweets(peterson_search, n=8000, lang="en") #THIS SHOULD SHOW ONE SPECIFIC TWEET BUT IT SHOWS NONE
+
+#cleaning tweets
+comp_tweets<-comp_tweets%>%
+  mutate(clean_tweet=gsub('[[:punct:] ]+',' ', text))
+
+comp_tweets$clean_tweet<-tolower(comp_tweets$clean_tweet)
+
+comp_tweets$text<-NULL
+colnames(comp_tweets)[colnames(comp_tweets)=="clean_tweet"]<-"text"
+
+
+#getting stp tweets
+
+
+stp_tweets<-comp_tweets%>%
+  mutate(stp = ifelse(grepl(stp_terms_search, text),"yes","no"))
+
+#%>%
+ # filter(comp_tweet=="yes")
+
+stp_tweets$comp_tweet<-NULL
+
+# score.sentiment <-function(sentences, pos.words, neg.words, .progress='none')
+#   {
+#   require(dplyr)
+#   require(stringr)
+#   scores <- laply(sentences, function(sentence, pos.words, neg.words){
+#     sentence <- gsub('[[:punct:]]', "", sentence)
+#     sentence <-gsub('[[:cntrl:]]',"", sentence)
+#     sentence <- gsub('\\d+',"", sentence)
+#     
+#   })
+# }
+
+# https://cran.r-project.org/web/packages/rtweet/vignettes/intro.html
+
+world <- ggplot2::map_data("world")
+us <- ggplot2::map_data("state")
+
+sm_coords <- lat_lng(comp_plan)
+
+#map of where people are tweeting 
+ggplot() +
+  geom_polygon(data = us, aes(x = long, y = lat, group = group)) +
+  geom_point(data = sm_coords, aes(x = lng, y = lat), color = "#01FF70", size = 0.5) +
+  coord_quickmap() +
+  guides(fill = FALSE) +
+  labs(title = "    Geographic Distribution of the mentions of @eScarry's Bad Tweet",
+       caption = "@tony_damiano") +
+  theme_void()
+
+#frequency of posts
+library(plotly)
+
+x<-ts_plot(comp_plan, "3 hours") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(plot.title = ggplot2::element_text(face = "bold")) +
+  ggplot2::labs(
+    x = NULL, y = NULL,
+    title = "Frequency of #MPLS2040 Twitter statuses from past 9 days",
+    subtitle = "Twitter status (tweet) counts aggregated using three-hour intervals",
+    caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+  )
+
+ggplotly(x)
+
+## search for 250,000 tweets containing the word data
+comp_plan <- search_tweets(
+  "#mpls2040", n = 250000, retryonratelimit = TRUE
+)
+
+
+#Remove urls
+text <- scarry_menchies$text %>% 
+  gsub("http.*", "", .) 
+
+#Remove Twitter Handles
+text <- text %>%
+  gsub("(^|[^@\\w])@(\\w{1,15})\\b", "", .) %>%
+  as_tibble() %>% 
+  unnest_tokens(word, value) 
+
+# Remove stop words (commaon english words)
+data("stop_words")
+
+cleaned <- text %>% 
+  anti_join(stop_words)
+
+# Top 20 Words
+# As a first step, I plotted the most frequently used 20 words in my sample of Eddie's mentions. Many of these are to be expected given the content of the original tweet (words like "clothes", "jacket" etc.), however the internet came through with "ratio" as the top word in all of Mr. Scarry's mentions and "creepy" also making it into the top 10.
+
+#Top 20 Words
+top20 <- cleaned %>%
+  count(word, sort = TRUE) %>%
+  top_n(20) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(y = "Count",
+       x = "",
+       title = "Top 20 unique words found in a sample of
+       @eScarry's Mentions 11/15/18",
+       caption = "@tony_damiano") +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 12))
+
+top20
+
+# tidytext is a flexible package and we can expand our frequency analysis and look at phrases too. Below is the same analysis as above except I told tidytext to find all two-word phrases. A lot of ratio talk going on.
+
+ngram2 <- text %>%
+  unnest_tokens(paired_words, word, token = "ngrams", n = 2) %>% 
+  count(paired_words, sort = T) %>% 
+  top_n(20) 
+
+ngram2 %>%
+  mutate(paired_words = reorder(paired_words, n)) %>% 
+  ggplot(aes(x = paired_words, y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(y = "Count",
+       x = "",
+       title = "Top 20 two-word phrases found in a sample of
+       @eScarry's Mentions 11/15/18",
+       caption = "@tony_damiano") +
+  theme_minimal() +
+  theme(text = element_text(size=14))
+
+# Data Science Binch!
+#   Lastly, as a measure of the density of weird left twitter's engagement, I did a query using common weird left twitter phrases including "binch", "corncob" and "chief".
+
+#Remove urls
+text <- scarry_menchies$text %>% 
+  gsub("http.*", "", .) 
+
+#Remove Twitter Handles
+text <- text %>%
+  gsub("(^|[^@\\w])@(\\w{1,15})\\b", "", .) %>%
+  as_tibble() %>% 
+  unnest_tokens(word, value) 
+
+# Remove stop words (commaon english words)
+data("stop_words")
+
+cleaned <- text %>% 
+  anti_join(stop_words)
+
+
+cleaned %>% 
+  count(word, sort = TRUE) %>% 
+  filter(str_detect(word, "binch") |
+           str_detect(word, "corncob") |
+           str_detect(word, "chief")
+  ) %>% 
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  scale_y_continuous(breaks = scales::pretty_breaks()) + #for interger values on count axis
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(y = "Count",
+       x = "",
+       title = "Words in found in a sample of @eScarry's mentions containing
+       'binch', 'corncob' and 'chief' 11/15/18",
+       caption = "@tony_damiano")
+
+write_csv(comp_plan, "comp_plan_tweets.csv")
