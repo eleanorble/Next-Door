@@ -1,0 +1,376 @@
+---
+title: "Getting Sentimental: An Analysis of Twin Cities Tweets and Headlines"
+author: "Elizabeth Abramson, Henry McCarthy, Eleanor Noble, Mia Smith & Marlee Yost-Wolff"
+date: "December 11, 2018"
+output: html_document
+---
+
+```{r, eval=FALSE, include= FALSE}
+# USE API KEY TO GET DATA
+
+library(rtweet)
+create_token(consumer_key = "nbs2ifQThpe2c0GbAGxNzStlC",
+             consumer_secret = "ZIaiorCe6ztntVBYHSHD1KmyVpl34rTWiOJuFOGTkbsUbQz16q",
+             access_token  = "547223936-XVkpzznbCkAmE6G0qO29KEbDtgs51pBhcuaGtbvE",
+             access_secret = "AaS4yhVz7S1Bd5qh2DGqo4CkVO1kTQIFSOIgBK01At0uN")
+
+
+Melvin <- search_tweets("@MayorCarter_", n = 2000, include_rts = TRUE, retryonratelimit = TRUE) %>%
+  mutate(mayorname="mayorM")
+
+Jacob <- search_tweets("@Jacob_Frey", n = 2000, include_rts = TRUE, retryonratelimit = TRUE)  %>%
+  mutate(mayorname="mayorJ")
+
+```
+
+```{r, eval=FALSE, include= FALSE}
+# CLEAN DATA SO IT CAN BE WRITTEN INTO CSV
+
+library(readr)
+Melvinclean <- Melvin %>%
+select(user_id, status_id, screen_name, text, source, display_text_width, reply_to_status_id, reply_to_user_id, reply_to_screen_name, is_quote, is_retweet,favorite_count, retweet_count, lang,quoted_status_id, quoted_text, quoted_created_at, quoted_source, quoted_favorite_count,quoted_retweet_count, quoted_user_id, quoted_screen_name, quoted_name,quoted_followers_count,  quoted_friends_count, quoted_statuses_count,quoted_location, quoted_description,quoted_verified, retweet_status_id, retweet_text,   retweet_created_at, retweet_source,retweet_favorite_count, retweet_retweet_count,retweet_friends_count,retweet_statuses_count, retweet_location,retweet_description, retweet_verified, place_url, place_name, place_full_name, place_type, country,country_code,    status_url, name, location,description, url, protected, followers_count,friends_count, listed_count, statuses_count,favourites_count, account_created_at, verified, profile_url,profile_expanded_url, account_lang, profile_banner_url,profile_background_url,  profile_image_url, created_at    )
+
+write_csv(Melvinclean, path = "Melvin.csv")
+
+Jacobclean <- Jacob %>%
+select(user_id, status_id, screen_name, text, source, display_text_width, reply_to_status_id, reply_to_user_id, reply_to_screen_name, is_quote, is_retweet,favorite_count, retweet_count, lang,quoted_status_id, quoted_text, quoted_created_at, quoted_source, quoted_favorite_count,quoted_retweet_count, quoted_user_id, quoted_screen_name, quoted_name,quoted_followers_count,  quoted_friends_count, quoted_statuses_count,quoted_location, quoted_description,quoted_verified, retweet_status_id, retweet_text,   retweet_created_at, retweet_source,retweet_favorite_count, retweet_retweet_count,retweet_friends_count,retweet_statuses_count, retweet_location,retweet_description, retweet_verified, place_url, place_name, place_full_name, place_type, country,country_code,    status_url, name, location,description, url, protected, followers_count,friends_count, listed_count, statuses_count,favourites_count, account_created_at, verified, profile_url,profile_expanded_url, account_lang, profile_banner_url,profile_background_url,  profile_image_url, created_at    )
+
+write_csv(Jacobclean, path = "Jacob.csv")
+```
+
+
+```{r, include= FALSE}
+# READ IN CSVS (TO AVOID RE-COLLECTING DATA EACH TIME)
+
+library(readr)
+MelvinOfficial<- read.csv(file="/Users/elizabethabramson/R_Studio/Final_Project/CSVs/Melvin.csv", header=TRUE, sep=",")
+JacobOfficial<- read.csv(file="/Users/elizabethabramson/R_Studio/Final_Project/CSVs/Jacob.csv", header=TRUE, sep=",")
+  
+```
+
+```{r, eval=FALSE, include= FALSE}
+# ADD MAYOR LABELS AND JOIN
+
+library(dplyr)
+MelvinOfficial<-MelvinOfficial %>%
+  mutate(Mayor="Melvin Carter")
+
+JacobOfficial<- JacobOfficial%>%
+  mutate(Mayor="Jacob Frey")
+
+MayorDate <- MelvinOfficial %>%
+  full_join (JacobOfficial, by = c("text"= "text", "Mayor"= "Mayor", "created_at" = "created_at")) %>%
+  select(text, Mayor, created_at) 
+```
+
+
+```{r, eval=FALSE, include= FALSE}
+# USE API KEY TO GET 2ND ROUND DATA 
+
+ library(rtweet)
+ create_token(consumer_key = "nbs2ifQThpe2c0GbAGxNzStlC",
+             consumer_secret = "ZIaiorCe6ztntVBYHSHD1KmyVpl34rTWiOJuFOGTkbsUbQz16q",
+              access_token  = "547223936-XVkpzznbCkAmE6G0qO29KEbDtgs51pBhcuaGtbvE",
+              access_secret = "AaS4yhVz7S1Bd5qh2DGqo4CkVO1kTQIFSOIgBK01At0uN")
+
+
+ Melvin_Second <- search_tweets("@MayorCarter_", n = 2000, include_rts = TRUE, retryonratelimit = TRUE) %>%
+   mutate(mayorname="mayorM")
+
+ Jacob_Second <- search_tweets("@Jacob_Frey", n = 2000, include_rts = TRUE, retryonratelimit = TRUE)  %>%
+   mutate(mayorname="mayorJ")
+
+```
+
+
+```{r, eval= FALSE, include= FALSE}
+# CLEAN DATA SO IT CAN BE WRITTEN INTO CSV
+
+library(readr)
+Melvinclean_Second <- Melvin_Second %>%
+select(user_id, status_id, screen_name, text, source, display_text_width, reply_to_status_id, reply_to_user_id, reply_to_screen_name, is_quote, is_retweet,favorite_count, retweet_count, lang,quoted_status_id, quoted_text, quoted_created_at, quoted_source, quoted_favorite_count,quoted_retweet_count, quoted_user_id, quoted_screen_name, quoted_name,quoted_followers_count,  quoted_friends_count, quoted_statuses_count,quoted_location, quoted_description,quoted_verified, retweet_status_id, retweet_text,   retweet_created_at, retweet_source,retweet_favorite_count, retweet_retweet_count,retweet_friends_count,retweet_statuses_count, retweet_location,retweet_description, retweet_verified, place_url, place_name, place_full_name, place_type, country,country_code,    status_url, name, location,description, url, protected, followers_count,friends_count, listed_count, statuses_count,favourites_count, account_created_at, verified, profile_url,profile_expanded_url, account_lang, profile_banner_url,profile_background_url,  profile_image_url, created_at    )
+
+write_csv(Melvinclean_Second, path = "Melvin_Second.csv")
+
+Jacobclean_Second <- Jacob_Second %>%
+select(user_id, status_id, screen_name, text, source, display_text_width, reply_to_status_id, reply_to_user_id, reply_to_screen_name, is_quote, is_retweet,favorite_count, retweet_count, lang,quoted_status_id, quoted_text, quoted_created_at, quoted_source, quoted_favorite_count,quoted_retweet_count, quoted_user_id, quoted_screen_name, quoted_name,quoted_followers_count,  quoted_friends_count, quoted_statuses_count,quoted_location, quoted_description,quoted_verified, retweet_status_id, retweet_text,   retweet_created_at, retweet_source,retweet_favorite_count, retweet_retweet_count,retweet_friends_count,retweet_statuses_count, retweet_location,retweet_description, retweet_verified, place_url, place_name, place_full_name, place_type, country,country_code,    status_url, name, location,description, url, protected, followers_count,friends_count, listed_count, statuses_count,favourites_count, account_created_at, verified, profile_url,profile_expanded_url, account_lang, profile_banner_url,profile_background_url,  profile_image_url, created_at    )
+
+write_csv(Jacobclean_Second, path = "Jacob_Second.csv")
+```
+
+```{r, include= FALSE}
+# READ IN 2ND ROUND CSVS
+
+library(readr)
+
+MelvinOfficial2<- read.csv(file="/Users/elizabethabramson/R_Studio/Final_Project/CSVs/Melvin_Second.csv", header=TRUE, sep=",")
+JacobOfficial2<- read.csv(file="/Users/elizabethabramson/R_Studio/Final_Project/CSVs/Jacob_Second.csv", header=TRUE, sep=",")
+
+```
+
+```{r, include= FALSE}
+# COMBINE CSVS AND REMOVE DUPLICATES
+
+library(dplyr)
+MelvinFull<- bind_rows(MelvinOfficial, MelvinOfficial2)
+JacobFull<-bind_rows(JacobOfficial, JacobOfficial2)
+
+MelvinClean<- MelvinFull %>%
+  distinct()
+
+JacobClean<- JacobFull %>%
+  distinct()
+  
+```
+
+```{r, eval= FALSE, include= FALSE}
+# USE API KEY TO GET 3RD ROUND DATA
+
+ library(rtweet)
+ create_token(consumer_key = "nbs2ifQThpe2c0GbAGxNzStlC",
+             consumer_secret = "ZIaiorCe6ztntVBYHSHD1KmyVpl34rTWiOJuFOGTkbsUbQz16q",
+              access_token  = "547223936-XVkpzznbCkAmE6G0qO29KEbDtgs51pBhcuaGtbvE",
+              access_secret = "AaS4yhVz7S1Bd5qh2DGqo4CkVO1kTQIFSOIgBK01At0uN")
+
+
+ Melvin_Third <- search_tweets("@MayorCarter_", n = 2000, include_rts = TRUE, retryonratelimit = TRUE) %>%
+   mutate(mayorname="mayorM")
+
+ Jacob_Third <- search_tweets("@Jacob_Frey", n = 2000, include_rts = TRUE, retryonratelimit = TRUE)  %>%
+   mutate(mayorname="mayorJ")
+```
+
+```{r, eval= FALSE,include= FALSE}
+# CLEAN DATA SO IT CAN BE WRITTEN INTO CSV
+
+library(readr)
+Melvinclean_Third <- Melvin_Third %>%
+select(user_id, status_id, screen_name, text, source, display_text_width, reply_to_status_id, reply_to_user_id, reply_to_screen_name, is_quote, is_retweet,favorite_count, retweet_count, lang,quoted_status_id, quoted_text, quoted_created_at, quoted_source, quoted_favorite_count,quoted_retweet_count, quoted_user_id, quoted_screen_name, quoted_name,quoted_followers_count,  quoted_friends_count, quoted_statuses_count,quoted_location, quoted_description,quoted_verified, retweet_status_id, retweet_text,   retweet_created_at, retweet_source,retweet_favorite_count, retweet_retweet_count,retweet_friends_count,retweet_statuses_count, retweet_location,retweet_description, retweet_verified, place_url, place_name, place_full_name, place_type, country,country_code,    status_url, name, location,description, url, protected, followers_count,friends_count, listed_count, statuses_count,favourites_count, account_created_at, verified, profile_url,profile_expanded_url, account_lang, profile_banner_url,profile_background_url,  profile_image_url, created_at    )
+
+write_csv(Melvinclean_Third, path = "Melvin_Third.csv")
+
+Jacobclean_Third <- Jacob_Third %>%
+select(user_id, status_id, screen_name, text, source, display_text_width, reply_to_status_id, reply_to_user_id, reply_to_screen_name, is_quote, is_retweet,favorite_count, retweet_count, lang,quoted_status_id, quoted_text, quoted_created_at, quoted_source, quoted_favorite_count,quoted_retweet_count, quoted_user_id, quoted_screen_name, quoted_name,quoted_followers_count,  quoted_friends_count, quoted_statuses_count,quoted_location, quoted_description,quoted_verified, retweet_status_id, retweet_text,   retweet_created_at, retweet_source,retweet_favorite_count, retweet_retweet_count,retweet_friends_count,retweet_statuses_count, retweet_location,retweet_description, retweet_verified, place_url, place_name, place_full_name, place_type, country,country_code,    status_url, name, location,description, url, protected, followers_count,friends_count, listed_count, statuses_count,favourites_count, account_created_at, verified, profile_url,profile_expanded_url, account_lang, profile_banner_url,profile_background_url,  profile_image_url, created_at    )
+
+write_csv(Jacobclean_Third, path = "Jacob_Third.csv")
+```
+
+```{r,include= FALSE}
+# READ IN THIRD ROUND OF CSVS
+
+library(readr)
+
+MelvinOfficial3<- read.csv(file="/Users/elizabethabramson/R_Studio/Final_Project/CSVs/Melvin_Third.csv", header=TRUE, sep=",")
+JacobOfficial3<- read.csv(file="/Users/elizabethabramson/R_Studio/Final_Project/CSVs/Jacob_Third.csv", header=TRUE, sep=",")
+
+```
+
+```{r, include= FALSE}
+# COMBINE CSVS AND REMOVE DUPLICATES
+
+MelvinFullest<- bind_rows(MelvinOfficial, MelvinOfficial2, MelvinOfficial3 )
+JacobFullest<-bind_rows(JacobOfficial, JacobOfficial2, JacobOfficial3 )
+
+MelvinCleanest<- MelvinFullest %>%
+  distinct()
+
+JacobCleanest<- JacobFullest %>%
+  distinct()
+
+```
+
+```{r, include= FALSE}
+# WRITE CSVS THAT INCLUDE ALL DATES AND NO DUPLICATES
+
+write_csv(JacobCleanest, path = "Jacob_AllDates.csv")
+write_csv(MelvinCleanest, path = "Melvin_AllDates.csv")
+```
+
+```{r, include= FALSE}
+# ADD MAYOR LABELS AND JOIN
+
+library(dplyr)
+MelvinCleanest<-MelvinCleanest %>%
+  mutate(Mayor="Melvin Carter")
+
+JacobCleanest<- JacobCleanest%>%
+  mutate(Mayor="Jacob Frey")
+
+MayorCleanest <- MelvinCleanest %>%
+  full_join (JacobCleanest, by = c("text"= "text", "Mayor"= "Mayor", "created_at" = "created_at")) %>%
+  select(text, Mayor, created_at) 
+```
+
+```{r, include= FALSE}
+# CREATE CLEAN DATES
+
+MayorDateGroup1 <- MayorCleanest %>%
+  mutate(date= substr(MayorCleanest$created_at, start=1, stop=10)) %>%
+  group_by(date, Mayor) %>%
+  summarise(n=n())
+```
+
+```{r, include=FALSE}
+library(plotly)
+```
+
+	In this graph, we can see that overall, Jacob Frey received many more mentions on Twitter than Melvin Carter did during the time period observed. This is likely due to multiple factors. Minneapolis, with roughly 420,000 residents, is more populous than St. Paul, which is home to 300,000 people. Assuming that people are most concerned with the actions of the mayor of their own city, we could expect more tweets at Jacob Frey in general. However, the explosion of twitter mentions of Jacob Frey seen during the range of dates we observed corresponds to a particular incident that got many twitter users talking across the Twin Cities and beyond. 
+	We can see that mentions spike around December 2, when news coverage of the racist Christmas tree event in Minneapolis’ fourth precinct was also escalating. The large number of tweets mentioning Jacob Frey around this time, and their strong focus on the Christmas tree incident, largely defined the results of our sentiment analyses.
+
+
+```{r, echo=FALSE}
+n<- ggplot(MayorDateGroup1, aes(x=date, y= n, fill=Mayor)) + geom_col(position= "stack", alpha=0.7) +   labs(x="Date",y="Number of Mentions") + scale_fill_manual(values=c("#e79f0f","#1d77a6")) + theme_minimal() + theme(axis.text.x=element_text(angle=45, hjust=1)) + ggtitle("Mentions by Date")
+
+ggplotly(n)
+
+```
+
+```{r, include= FALSE}
+# ISOLATE TOP 25 MOST FAVORITED TWEETS MENTIONING EACH MAYOR
+
+MelvinFavorite <- MelvinCleanest %>%
+  group_by(text) %>%
+  summarise(favorites= sum(favorite_count)) %>%
+  arrange(desc(favorites))%>%
+  filter(favorites>=7)
+
+JacobFavorite <- JacobCleanest %>%
+  group_by(text) %>%
+  summarise(favorites= sum(favorite_count)) %>%
+  arrange(desc(favorites))%>%
+  filter(favorites>=76)
+```
+
+```{r, include= FALSE}
+# CREATE TEXT-ONLY TABLES FOR EACH MAYOR
+
+MelFav_Text <- MelvinFavorite %>%
+  select(text) %>%
+  mutate(Mayor = "Melvin")
+
+JacFav_Text <- JacobFavorite %>%
+  select(text) %>%
+  mutate(Mayor = "Jacob")
+
+
+# COMBINE TO SINGLE TEXT-MAYOR TABLE
+MayorsFav_Text <- JacFav_Text %>%
+  full_join(MelFav_Text, by=c("text" = "text", "Mayor" = "Mayor"))
+
+```
+
+
+```{r, include= FALSE}
+# REMOVE DISTRACTING CHARACTERS
+
+require(stringr)
+library(rtweet)
+library(tidytext)
+
+MelFav_Text$text<-gsub("@\\w+", "", MelFav_Text$text)
+MelFav_Text$text<- str_replace_all(MelFav_Text$text, "https://t.co/[a-z,A-Z,0-9]*","")
+
+JacFav_Text$text<-gsub("@\\w+", "", JacFav_Text$text)
+JacFav_Text$text<- str_replace_all(JacFav_Text$text, "https://t.co/[a-z,A-Z,0-9]*","")
+
+MayorsFav_Text$text<-gsub("@\\w+", "", MayorsFav_Text$text)
+MayorsFav_Text$text<- str_replace_all(MayorsFav_Text$text, "https://t.co/[a-z,A-Z,0-9]*","")
+```
+
+```{r, include= FALSE}
+# UNNEST TOKENS TO CREATE WORD-ONLY TABLES FOR EACH MAYOR AND COMBINED TABLE
+
+require(stringr)
+library(rtweet)
+library(tidytext)
+
+tidy_Mel <- MelFav_Text %>%
+  unnest_tokens(word, text)
+
+tidy_Jac <- JacFav_Text %>%
+  unnest_tokens(word, text)
+
+tidy_Mayors <- MayorsFav_Text %>%
+  unnest_tokens(word, text)
+```
+
+```{r, include= FALSE}
+# REMOVE STOPWORDS
+
+data(stop_words)
+
+Mel_NoStop <- tidy_Mel %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+
+Jac_NoStop <- tidy_Jac %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+
+Mayors_NoStop <- tidy_Mayors %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+
+```
+
+```{r, include= FALSE}
+# FILTER OUT OTHER DISTRACTING WORDS
+
+# MELVIN CARTER
+Mel_NoStop <- Mel_NoStop %>%
+  filter(word != "https") %>%
+  filter(word != "t.co") %>%
+  filter(word != "mayorcarter_") %>%
+  filter(word != "paul") %>%
+  filter(word != "st")%>%
+  filter(word != "i'm") %>%
+  filter(word != "there's")
+ 
+# JACOB FREY
+Jac_NoStop <- Jac_NoStop %>%
+  filter(word != "jacob_frey") %>%
+  filter(word != "jeremiah4north") %>%
+  filter(word != "northxnorthside") %>%
+  filter(word != "cunninghammpls") %>%
+  filter(word != "https") %>%
+  filter(word != "t.co") %>%
+  filter(word != "paul") %>%
+  filter(word != "st") %>%
+  filter(word != "i'm") %>%
+  filter(word != "there's")
+
+
+```
+
+```{r, include= FALSE}
+# DEFINE SENTIMENT LEXICON
+
+nrc <- sentiments %>% filter(lexicon == "nrc")
+
+Melnrc<- Mel_NoStop %>% 
+  inner_join(nrc) %>% 
+  count(sentiment) %>%
+  mutate(Mayor= "Melvin Carter")
+
+Jacnrc<- Jac_NoStop %>% 
+  inner_join(nrc) %>% 
+  count(sentiment)%>%
+  mutate(Mayor= "Jacob Frey")
+
+```
+
+```{r, include= FALSE}
+# JOIN SENTIMENT TABLES
+
+Mayorsnrc <- Melnrc %>%
+  full_join (Jacnrc, by = c("sentiment"= "sentiment", "Mayor"= "Mayor", "nn" = "nn")) %>%
+  group_by(Mayor, sentiment, nn) %>%
+  summarise(n=n())
+```
+	This graph shows the sentiment of the most favorited tweets that mentioning each mayor. To make this graph, the top 25 most favorited tweets mentioning Jacob Frey and the 25 most favorited tweets mentioning Melvin Carter were gathered. The text of these tweets was then analyzed, characterizing each word of the tweets according to its sentiment. We can see that overall, the most favorited tweets mentioning Jacob Frey overwhelmingly reflect more negative sentiments, such as disgust and sadness, than those mentioning Melvin Carter, which reflect sentiments such as anticipation and joy to a greater degree.
+
+```{r, echo=FALSE}
+ggplot(Mayorsnrc, aes(x=sentiment, y= nn, fill=Mayor))+geom_col(position="fill",alpha=0.7 ) + labs(x="Sentiment",y="Percentage of Favorited Tweets")+
+ggtitle("Sentiment of Most Favorited Tweets Mentioning Mayors") + scale_fill_manual(values = c("#e79f0f","#1d77a6"))+ theme_minimal() + theme(axis.text.x=element_text(angle=45, hjust=1))
+
+```
